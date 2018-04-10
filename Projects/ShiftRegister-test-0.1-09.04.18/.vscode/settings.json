@@ -3,5 +3,9 @@
 		"PATH": "/home/jan/.platformio/penv/bin:/home/jan/.platformio/penv:/usr/local/sbin:/usr/local/bin:/usr/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/tools:/opt/android-sdk/tools/bin:/usr/lib/jvm/default/bin:/opt/opencascade/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl",
 		"PLATFORMIO_CALLER": "vscode"
 	},
-	"C_Cpp.errorSquiggles": "Disabled"
+	"C_Cpp.errorSquiggles": "Disabled",
+	"cSpell.words": [
+		"eepromaddr",
+		"eepromsize"
+	]
 }
