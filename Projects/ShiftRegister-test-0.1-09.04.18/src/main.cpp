@@ -11,7 +11,7 @@
 #define IO8 12
 #define WE  A0
 #define OE  A1
-#define EEPROMSIZE 8
+#define EEPROMSIZE 1
 
 
 /*void registerWrite(bool arr[]) // OLD registerWrite with array input of booleans
@@ -74,21 +74,17 @@ void eepromPrint()
     }
     */
 
-    for(int i(0); i<= EEPROMSIZE; i++)
+    for(int i(0), b(0); i<= EEPROMSIZE; i++)
     {
-        int byte(0);
-
         registerWrite(i);
 
         for(int j = IO1, p(0); j <= IO8; j++, p++)
         {
-            if(digitalRead(j) == 1) byte = byte + pow(2,p);
-            else byte += 0;
-
-            Serial.print(byte);
+            if(digitalRead(j) == 1) b += pow(2,p);
         }
-        //Serial.print(byte,HEX);
-        //Serial.print(" ");
+        Serial.print(b,HEX);
+        Serial.print(" ");
+        b = 0;
     }
 
 }
@@ -106,8 +102,8 @@ void setup()
 
     for(int pin = IO1; pin <= IO8; pin++) pinMode(pin,INPUT);       //loop to set datapins
 
-    eepromPrint();
-    //registerWrite(0);
+    //eepromPrint();
+    registerWrite(0);
 
 }
 
