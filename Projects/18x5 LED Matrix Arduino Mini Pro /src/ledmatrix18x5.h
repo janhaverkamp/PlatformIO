@@ -11,31 +11,7 @@
 #define ROWS    5
 #define COLUMNS 18
 
-static int yarray[5] = {5,7,8,9};
-
-/*
-void registerWrite(int address)
-{
-    static int p(REGISTERS*8);         //highest address
-
-    digitalWrite(LATCH,0);
-
-    for(int i(0); i <= p ; i++)
-    {
-        digitalWrite(CLOCK,0);
-        if(address >= pow(2,-(i-17)))
-        {
-            address = address - pow(2,i);
-            digitalWrite(DATA,1);   //bits[p] = 1;
-        }
-        else digitalWrite(DATA,0);  //bits[p] = 0;
-
-        digitalWrite(CLOCK,1);
-        digitalWrite(CLOCK,0);
-    }
-    digitalWrite(LATCH,1);
-}
-*/
+const int yarray[] = {4,6,7,8,9};
 
 void initShifts()//SHIFT REGISTER
 {
@@ -90,63 +66,45 @@ void matrixDot(int x, int y)
 
 }
 
-void matrixArray(bool array[18][5])
-{/*
-	int x(1), y(1), bit;
-	for(y = 1; y <= 5; y++)
-	{
-		for(x = 1; x <= 18; x++)
-		{
-			bit = array[x-1][y-1];
-			switch(x)
-			{
-				case 1: digitalWrite(A3,bit);
-						break;
-				case 2: digitalWrite(A2,bit);
-						break;
-				default: digitalWrite(DATA,bit);
-						 break;
-			}
-			digitalWrite(CLOCK,0x01);
-			digitalWrite(CLOCK,0x00);
-            digitalWrite(DATA,0);
-
-            digitalWrite(y-1,1);
-            digitalWrite(y,0);
-		}
-		digitalWrite(LATCH,0x01);
-		digitalWrite(LATCH,0x00);
-	}*/
-    for(int i(0); i <= 4; i++) digitalWrite(yarray[i],0x01);
-
+void matrixArray(bool array[5][18])
+{
     for(int y(0); y <= 4; y++)
     {
-        digitalWrite(yarray[i],0x00);
-
+        for(int i(0); i <= 4; i++) digitalWrite(yarray[i],0x01);
         for(int x(0); x<= 17; x++)
-            static bool bit = array[x][y];
-            switch(x)
+        {
+            if(array[y][x] == true)
             {
-                case 1: 
-                        digitalWrite(A3,bit);
-                        digitalWrite(A2,-bit);
-                        digitalWrite(DATA,-bit);
-                        break;
-                case 2: 
-                        digitalWrite(A2,bit);
-                        digitalWrite(A3,-bit);
-                        digitalWrite(DATA,-bit);
-                        break;
-                default:
-                        digitalWrite(DATA,bit);
-                        digitalWrite(A3,-bit);
-                        digitalWrite(A2,-bit);
+                switch(x)
+                {
+                    case 0: 
+                            digitalWrite(A3,0x01);
+                            digitalWrite(A2,0x00);
+                            digitalWrite(DATA,0x00);
+                            break;
+                    case 1: 
+                            digitalWrite(A2,0x01);
+                            digitalWrite(A3,0x00);
+                            digitalWrite(DATA,0x00);
+                            break;
+                    default:
+                            digitalWrite(DATA,0x01);
+                            digitalWrite(A3,0x00);
+                            digitalWrite(A2,0x00);
+                }
+            }
+            else
+            {
+                digitalWrite(DATA,0x00);
+                digitalWrite(A2,0x00);
+                digitalWrite(A3,0x00);
             }
             CLOCKPULSE
         }
         LATCHPULSE
-        delay(10);
-        digitalWrite(yarray[i],0x01);
+        digitalWrite(yarray[y],0x00);
+        delay(1);
+    }
 }
 
 void matrixClear()
