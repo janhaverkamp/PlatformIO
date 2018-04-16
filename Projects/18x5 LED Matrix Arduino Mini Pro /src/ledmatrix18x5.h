@@ -186,54 +186,53 @@ void matrixTest()
 
 void squash()
 {
-    int x(4),y(2),pb(2),cb(17),vx(0),vy(0),pp(2),cp(2),pscore(0),cscore(0),speed(15);
+    int x(4),y(2),pb(2),cb(17),vx(0),vy(0),pp(2),cp(2),speed(20);
 
-    while(pb < cb)
+    while(speed > 0)
     {
-        if      (dpadinput == 1 && pp > 0) pp -= 1;
-		else if (dpadinput == 4 && pp < 4) pp += 1;
-
-        arr[pp][pb] = 1; arr[pp-1][pb] = 0; arr[pp+1][pb] = 0; //player cursor
-
-        if(dpadinput == 3 && vx == 0 && vy == 0) 
+        while(pb < cb)
         {
-            if(pp > 2) vy = -1;
-            else if(pp < 2) vy = 1;
-            y = pp; x = pb;
-            vx = 1;
+            if      (dpadinput == 1 && pp > 0) pp -= 1;
+            else if (dpadinput == 4 && pp < 4) pp += 1;
+
+            arr[pp][pb] = 1; arr[pp-1][pb] = 0; arr[pp+1][pb] = 0; //player cursor
+
+            if(dpadinput == 3 && vx == 0 && vy == 0) 
+            {
+                if(pp == 2) vy=(random(10,30) > 20) ? -1 : 1;
+                else if(pp > 2) vy = -1;
+                else if(pp < 2) vy = 1;
+                y = pp; x = pb;
+                vx = 1;
+            }
+            dpadinput = 0;
+
+            
+
+            if(vx == 1 && x <= cb)      {x++; arr[y][x] = 1; arr[y][x-1] = 0;}
+            else if(vx == -1 && x >= pb) {x--; arr[y][x] = 1; arr[y][x+1] = 0;}
+            if(vy == 1 && y <= 4)       {y++; arr[y][x] = 1; arr[y-1][x] = 0;}
+            else if(vy == -1 && y >= 0) {y--; arr[y][x] = 1; arr[y+1][x] = 0;}
+
+            if(y == 0 || y == 4)                vy = -vy;
+            if(x == cb || (x == pb && pp == y)) vx = -vx;
+            else if(x == pb && pp != y && !(vx == 0 && vx == 0))
+            {
+                vx     =  0; vy     =  0;
+                arr[pp][pb] = 0;
+                pb++;
+            }
+            matrixArray(arr,speed);
         }
-        dpadinput = 0;
-
-        
-
-        if(vx == 1 && x <= cb)      {x++; arr[y][x] = 1; arr[y][x-1] = 0;}
-        else if(vx == -1 && x >= pb) {x--; arr[y][x] = 1; arr[y][x+1] = 0;}
-        if(vy == 1 && y <= 4)       {y++; arr[y][x] = 1; arr[y-1][x] = 0;}
-        else if(vy == -1 && y >= 0) {y--; arr[y][x] = 1; arr[y+1][x] = 0;}
-
-        if(y == 0 || y == 4)                vy = -vy;
-        if(x == cb || (x == pb && pp == y))
+        for(int b(0); b <= 4; b++)  //clear after gameover
         {
-            vx = -vx;
+            for(int n(0); n <= 17; n++)
+            {
+                arr[b][n] = 0;
+            }
         }
-        else if(x == pb && pp != y && !(vx == 0 && vx == 0))
-        {
-             vx     =  0; vy     =  0; cscore += 1;
-             arr[pp][pb] = 0;
-             pb++;
-        }
-        matrixArray(arr,speed);
+        speed -= 5;
     }
-    for(int b(0); b <= 4; b++)
-    {
-        for(int n(0); n <= 17; n++)
-        {
-            arr[b][n] = 0;
-        }
-    }
-
-
-
 }
 
 #endif
