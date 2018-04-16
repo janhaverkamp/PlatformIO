@@ -1,13 +1,8 @@
 #include <Arduino.h>
 #include "ledmatrix18x5.h"
+//#include <pins_Arduino.h>
 
-static bool arr[5][18] ={
-    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    {0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0},
-    {1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0},
-    {0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0},
-    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-};
+
 
 void setup()
 {
@@ -17,9 +12,13 @@ void setup()
     matrixClear();
 }
 
+void menu()
+{
+    
+}
+
 void loop()
 {
-    matrixArray(arr);
-    //matrixTest();
+    squash();
 }
 

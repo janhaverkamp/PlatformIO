@@ -12,6 +12,16 @@
 #define COLUMNS 18
 
 const int yarray[] = {4,6,7,8,9};
+int dpadinput;
+
+static bool arr[5][18] ={
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+};
+
 
 void initShifts()//SHIFT REGISTER
 {
@@ -23,12 +33,39 @@ void initShifts()//SHIFT REGISTER
     for(int i(4);i<=9; i++) pinMode(i,OUTPUT);      //Output of Rows
 }
 
+void pciSetup(byte pin)
+{
+    *digitalPinToPCMSK(pin) |= bit (digitalPinToPCMSKbit(pin));
+    PCIFR |= bit(digitalPinToPCICRbit(pin));
+    PCICR |= bit(digitalPinToPCICRbit(pin)); 
+
+}
+
 void initDpad()		//Init DPAD
 {
 	pinMode(A1,INPUT);      //DPAD analog in
     pinMode(A0,INPUT);      //DPAD analog in
     pinMode(A5,INPUT);      //DPAD analog in
     pinMode(A4,INPUT);      //DPAD analog in
+
+    digitalWrite(A0, HIGH); //Internal pullups
+    digitalWrite(A1, HIGH);
+    digitalWrite(A4, HIGH);
+    digitalWrite(A5, HIGH);
+
+    pciSetup(A0);
+    pciSetup(A1);
+    pciSetup(A4);
+    pciSetup(A5);
+}
+
+ISR (PCINT1_vect)
+{
+    if(digitalRead(A0) == 1) dpadinput = 1;
+    else if(digitalRead(A1) == 1) dpadinput = 2;
+    else if(digitalRead(A4) == 1) dpadinput = 3;
+    else if(digitalRead(A5) == 1) dpadinput = 4;
+
 }
 
 void matrixDot(int x, int y)
@@ -66,44 +103,47 @@ void matrixDot(int x, int y)
 
 }
 
-void matrixArray(bool array[5][18])
+void matrixArray(bool array[5][18],int t)
 {
-    for(int y(0); y <= 4; y++)
+    for(int z(0);z<=t;z++)
     {
-        for(int i(0); i <= 4; i++) digitalWrite(yarray[i],0x01);
-        for(int x(0); x<= 17; x++)
+        for(int y(0); y <= 4; y++)
         {
-            if(array[y][x] == true)
+            for(int i(0); i <= 4; i++) digitalWrite(yarray[i],0x01);
+            for(int x(0); x<= 17; x++)
             {
-                switch(x)
+                if(array[y][x] == true)
                 {
-                    case 0: 
-                            digitalWrite(A3,0x01);
-                            digitalWrite(A2,0x00);
-                            digitalWrite(DATA,0x00);
-                            break;
-                    case 1: 
-                            digitalWrite(A2,0x01);
-                            digitalWrite(A3,0x00);
-                            digitalWrite(DATA,0x00);
-                            break;
-                    default:
-                            digitalWrite(DATA,0x01);
-                            digitalWrite(A3,0x00);
-                            digitalWrite(A2,0x00);
+                    switch(x)
+                    {
+                        case 0: 
+                                digitalWrite(A3,0x01);
+                                digitalWrite(A2,0x00);
+                                digitalWrite(DATA,0x00);
+                                break;
+                        case 1: 
+                                digitalWrite(A2,0x01);
+                                digitalWrite(A3,0x00);
+                                digitalWrite(DATA,0x00);
+                                break;
+                        default:
+                                digitalWrite(DATA,0x01);
+                                digitalWrite(A3,0x00);
+                                digitalWrite(A2,0x00);
+                    }
                 }
+                else
+                {
+                    digitalWrite(DATA,0x00);
+                    digitalWrite(A2,0x00);
+                    digitalWrite(A3,0x00);
+                }
+                CLOCKPULSE
             }
-            else
-            {
-                digitalWrite(DATA,0x00);
-                digitalWrite(A2,0x00);
-                digitalWrite(A3,0x00);
-            }
-            CLOCKPULSE
+            LATCHPULSE
+            digitalWrite(yarray[y],0x00);
+            delay(1);
         }
-        LATCHPULSE
-        digitalWrite(yarray[y],0x00);
-        delay(1);
     }
 }
 
@@ -142,6 +182,58 @@ void matrixTest()
 		delay(100);
 		matrixClear();
     }
+}
+
+void squash()
+{
+    int x(4),y(2),pb(2),cb(17),vx(0),vy(0),pp(2),cp(2),pscore(0),cscore(0),speed(15);
+
+    while(pb < cb)
+    {
+        if      (dpadinput == 1 && pp > 0) pp -= 1;
+		else if (dpadinput == 4 && pp < 4) pp += 1;
+
+        arr[pp][pb] = 1; arr[pp-1][pb] = 0; arr[pp+1][pb] = 0; //player cursor
+
+        if(dpadinput == 3 && vx == 0 && vy == 0) 
+        {
+            if(pp > 2) vy = -1;
+            else if(pp < 2) vy = 1;
+            y = pp; x = pb;
+            vx = 1;
+        }
+        dpadinput = 0;
+
+        
+
+        if(vx == 1 && x <= cb)      {x++; arr[y][x] = 1; arr[y][x-1] = 0;}
+        else if(vx == -1 && x >= pb) {x--; arr[y][x] = 1; arr[y][x+1] = 0;}
+        if(vy == 1 && y <= 4)       {y++; arr[y][x] = 1; arr[y-1][x] = 0;}
+        else if(vy == -1 && y >= 0) {y--; arr[y][x] = 1; arr[y+1][x] = 0;}
+
+        if(y == 0 || y == 4)                vy = -vy;
+        if(x == cb || (x == pb && pp == y))
+        {
+            vx = -vx;
+        }
+        else if(x == pb && pp != y && !(vx == 0 && vx == 0))
+        {
+             vx     =  0; vy     =  0; cscore += 1;
+             arr[pp][pb] = 0;
+             pb++;
+        }
+        matrixArray(arr,speed);
+    }
+    for(int b(0); b <= 4; b++)
+    {
+        for(int n(0); n <= 17; n++)
+        {
+            arr[b][n] = 0;
+        }
+    }
+
+
+
 }
 
 #endif
