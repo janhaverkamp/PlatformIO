@@ -50,7 +50,7 @@ const bool hme[5][18] ={                        //HOME bitmap array
     {0,0,0,1,1,1,0,0,0,1,1,1,0,0,1,1,1,0}
 };
 
-void initShifts()//SHIFT REGISTER               //Initialisation of shiftregisters
+void initShifts()                               //SHIFT REGISTER
 {
     pinMode(DATA,OUTPUT);                       //Setting the outputs
     pinMode(CLOCK,OUTPUT);
@@ -68,9 +68,9 @@ void pciSetup(byte pin)                         //Setup of general interrupt-fun
 
 }
 
-void initDpad()		                            //Initialisation of the DPAD
+void initDpad()                                 //Initialisation of the DPAD
 {
-	pinMode(A1,INPUT);                          //DPAD analog in
+    pinMode(A1,INPUT);                          //DPAD analog in
     pinMode(A0,INPUT);
     pinMode(A5,INPUT);
     pinMode(A4,INPUT);
@@ -188,19 +188,19 @@ void matrixTest()                               //Test function to check led's a
 {
     for(int x(1), y(1); ; )                     //Endless loop with (x) and (y) definition
     {
-		if(digitalRead(A0) == 1) y -= 1;        //Change position when pressin a button
-		else if(digitalRead(A1) == 1) x -= 1;
-		else if(digitalRead(A5) == 1) y += 1;
-		else if(digitalRead(A4) == 1) x += 1;
+        if(digitalRead(A0) == 1) y -= 1;        //Change position when pressin a button
+        else if(digitalRead(A1) == 1) x -= 1;
+        else if(digitalRead(A5) == 1) y += 1;
+        else if(digitalRead(A4) == 1) x += 1;
 
-		if(x == 19) x = 1;                      //Jump to other side, when crossing boundry
-		else if( x== 0) x = 18;
-		if(y == 6)  y = 1;
-		else if(y == 0) y = 5;
+        if(x == 19) x = 1;                      //Jump to other side, when crossing boundry
+        else if( x== 0) x = 18;
+        if(y == 6)  y = 1;
+        else if(y == 0) y = 5;
 
-		matrixDot(x,y);                         //Display the dot, by function matrixDot(int x,int y);
-		delay(100);                             //Delay to reduce speed
-		matrixClear();                          //Clear screen, by function matrixClear();
+        matrixDot(x,y);                         //Display the dot, by function matrixDot(int x,int y);
+        delay(100);                             //Delay to reduce speed
+        matrixClear();                          //Clear screen, by function matrixClear();
     }
 }
 
@@ -208,9 +208,9 @@ void squash()                                   //Pong-game knockoff
 {
     int x(4),y(2),pb(2),cb(17),vx(0),vy(0),pp(2),cp(2),speed(20);       //Game variables
 
-    while(speed > 0)    //Loop until speed is 1:0
+    while(speed > 0)                                                    //Loop until speed is 1:0
     {
-        while(pb < cb)  //Loop until playerbar reaches cpubar
+        while(pb < cb)                                                  //Loop until playerbar reaches cpubar
         {
             if      (dpadinput == 1 && pp > 0) pp -= 1;                 //Position of playerbar
             else if (dpadinput == 3 && pp < 4) pp += 1;
@@ -226,8 +226,6 @@ void squash()                                   //Pong-game knockoff
                 vx = 1;
             }
             dpadinput = 0;                                              //Clear input
-
-            
 
             if(vx == 1 && x <= cb)      {x++; arr[y][x] = 1; arr[y][x-1] = 0;}      //Boundries
             else if(vx == -1 && x >= pb) {x--; arr[y][x] = 1; arr[y][x+1] = 0;}     //and write pos into array
@@ -251,7 +249,7 @@ void squash()                                   //Pong-game knockoff
                 arr[b][n] = 0;
             }
         }
-        speed -= 5;
+        speed -= 5;                                                     //Speedup after loose
     }
 }
 
