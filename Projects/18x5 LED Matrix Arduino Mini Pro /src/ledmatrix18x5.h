@@ -22,6 +22,21 @@ static bool arr[5][18] ={
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 };
 
+bool png[5][18] ={
+    {0,0,0,1,1,0,0,1,0,0,0,1,0,0,1,1,1,1},
+    {0,0,1,0,0,1,0,1,1,0,0,1,0,1,0,0,0,0},
+    {0,0,1,1,1,0,0,1,0,1,0,1,0,1,1,1,1,0},
+    {0,0,1,0,0,0,0,1,0,0,1,1,0,1,0,0,0,1},
+    {0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,1,1,0}
+};
+
+bool tst[5][18] ={
+    {0,0,1,1,1,0,1,1,1,0,0,1,1,1,0,1,1,1},
+    {0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,1,0},
+    {0,0,0,1,0,0,1,1,0,0,0,1,1,0,0,0,1,0},
+    {0,0,0,1,0,0,1,0,0,0,0,0,0,1,0,0,1,0},
+    {0,0,0,1,0,0,1,1,1,0,1,1,1,0,0,0,1,0}
+};
 
 void initShifts()//SHIFT REGISTER
 {
@@ -62,9 +77,9 @@ void initDpad()		//Init DPAD
 ISR (PCINT1_vect)
 {
     if(digitalRead(A0) == 1) dpadinput = 1;
-    else if(digitalRead(A1) == 1) dpadinput = 2;
-    else if(digitalRead(A4) == 1) dpadinput = 3;
-    else if(digitalRead(A5) == 1) dpadinput = 4;
+    if(digitalRead(A1) == 1) dpadinput = 4;
+    if(digitalRead(A4) == 1) dpadinput = 2;
+    if(digitalRead(A5) == 1) dpadinput = 3;
 
 }
 
@@ -105,16 +120,16 @@ void matrixDot(int x, int y)
 
 void matrixArray(bool array[5][18],int t)
 {
-    for(int z(0);z<=t;z++)
+    for(int z(0);z<=t;z++)      //Hold on time
     {
-        for(int y(0); y <= 4; y++)
+        for(int y(0); y <= 4; y++)      //Y row loop 
         {
-            for(int i(0); i <= 4; i++) digitalWrite(yarray[i],0x01);
-            for(int x(0); x<= 17; x++)
+            for(int i(0); i <= 4; i++) digitalWrite(yarray[i],0x01);    //Turn off all y pins (HIGH)
+            for(int x(0); x<= 17; x++)                                  //X Column loop
             {
-                if(array[y][x] == true)
+                if(array[y][x] == true)     //only execute if pixel is on
                 {
-                    switch(x)
+                    switch(x)               //decide btw. pin 1, 2 o. shiftregister
                     {
                         case 0: 
                                 digitalWrite(A3,0x01);
@@ -168,12 +183,13 @@ void matrixClear()
 
 void matrixTest()
 {
-    for(int x(1), y(1); true; )
+    for(int x(1), y(1); ; )
     {
 		if(digitalRead(A0) == 1) y -= 1;
 		else if(digitalRead(A1) == 1) x -= 1;
 		else if(digitalRead(A5) == 1) y += 1;
 		else if(digitalRead(A4) == 1) x += 1;
+
 		if(x == 19) x = 1;
 		else if( x== 0) x = 18;
 		if(y == 6)  y = 1;
@@ -184,20 +200,20 @@ void matrixTest()
     }
 }
 
-void squash()
+void squash()         //Pong-game knockoff
 {
-    int x(4),y(2),pb(2),cb(17),vx(0),vy(0),pp(2),cp(2),speed(20);
+    int x(4),y(2),pb(2),cb(17),vx(0),vy(0),pp(2),cp(2),speed(20);       //Game variables
 
-    while(speed > 0)
+    while(speed > 0)    //Loop until speed is 1:0
     {
-        while(pb < cb)
+        while(pb < cb)  //Loop until playerbar reaches cpubar
         {
-            if      (dpadinput == 1 && pp > 0) pp -= 1;
-            else if (dpadinput == 4 && pp < 4) pp += 1;
+            if      (dpadinput == 1 && pp > 0) pp -= 1;                 //Position of playerbar
+            else if (dpadinput == 3 && pp < 4) pp += 1;
 
-            arr[pp][pb] = 1; arr[pp-1][pb] = 0; arr[pp+1][pb] = 0; //player cursor
+            arr[pp][pb] = 1; arr[pp-1][pb] = 0; arr[pp+1][pb] = 0;      //Write player cursor pos in array
 
-            if(dpadinput == 3 && vx == 0 && vy == 0) 
+            if(dpadinput == 2 && vx == 0 && vy == 0)                    //Start directions for ball
             {
                 if(pp == 2) vy=(random(10,30) > 20) ? -1 : 1;
                 else if(pp > 2) vy = -1;
@@ -205,26 +221,26 @@ void squash()
                 y = pp; x = pb;
                 vx = 1;
             }
-            dpadinput = 0;
+            dpadinput = 0;                                              //Clear input
 
             
 
-            if(vx == 1 && x <= cb)      {x++; arr[y][x] = 1; arr[y][x-1] = 0;}
-            else if(vx == -1 && x >= pb) {x--; arr[y][x] = 1; arr[y][x+1] = 0;}
+            if(vx == 1 && x <= cb)      {x++; arr[y][x] = 1; arr[y][x-1] = 0;}      //Boundries
+            else if(vx == -1 && x >= pb) {x--; arr[y][x] = 1; arr[y][x+1] = 0;}     //and write pos into array
             if(vy == 1 && y <= 4)       {y++; arr[y][x] = 1; arr[y-1][x] = 0;}
             else if(vy == -1 && y >= 0) {y--; arr[y][x] = 1; arr[y+1][x] = 0;}
 
-            if(y == 0 || y == 4)                vy = -vy;
-            if(x == cb || (x == pb && pp == y)) vx = -vx;
-            else if(x == pb && pp != y && !(vx == 0 && vx == 0))
+            if(y == 0 || y == 4)                vy = -vy;               //Change of direction on touch of a 
+            if(x == cb || (x == pb && pp == y)) vx = -vx;               //boundry
+            else if(x == pb && pp != y && !(vx == 0 && vx == 0))        //When ball wasn't catched
             {
                 vx     =  0; vy     =  0;
                 arr[pp][pb] = 0;
                 pb++;
             }
-            matrixArray(arr,speed);
+            matrixArray(arr,speed);                                     //Write array into function
         }
-        for(int b(0); b <= 4; b++)  //clear after gameover
+        for(int b(0); b <= 4; b++)                                      //clear after gameover
         {
             for(int n(0); n <= 17; n++)
             {
@@ -232,6 +248,36 @@ void squash()
             }
         }
         speed -= 5;
+    }
+}
+
+void menu()         //Mainmenu loop
+{
+    int men(0), mlimit(2);                                  //Limit of menuitems
+    while(true)                                             //Endless loop
+    {
+        if(dpadinput == 1 && men < mlimit) men++;           //Change of menuentries
+        else if(dpadinput == 3 && men > 0) men--;
+        dpadinput = 0;
+
+        switch(men)                                         //switch for menuitems
+        {
+            case 0:
+                    matrixArray(hme,10);
+                    break;
+
+            case 1:                                         //PONG
+                    matrixArray(png,10);
+                    if(digitalRead(A4) == 1) squash();      //Call of the function squash
+                    break;
+            case 2:                                         //TestMatrix
+                    matrixArray(tst,10);
+                    if(digitalRead(A4) == 1) matrixTest();  //Call a matrix test program to test all led's and buttons
+                    break;
+            default:                                        //Default case, if no item is selected
+                    matrixClear();
+                    break;
+        }
     }
 }
 
