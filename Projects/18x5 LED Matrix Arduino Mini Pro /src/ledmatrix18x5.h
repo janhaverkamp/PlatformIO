@@ -253,7 +253,7 @@ void squash()                                   //Pong-game knockoff
     }
 }
 
-void menu()                                     //Mainmenu loop
+void menu()                                                 //Mainmenu loop
 {
     int men(0), mlimit(2);                                  //Limit of menuitems
     while(true)                                             //Endless loop
@@ -283,4 +283,4 @@ void menu()                                     //Mainmenu loop
     }
 }
 
-#endif                                          //End of definition
+#endif                                                      //End of definition
