@@ -50,6 +50,14 @@ const bool hme[5][18] ={                        //HOME bitmap array
     {0,0,0,1,1,1,0,0,0,1,1,1,0,0,1,1,1,0}
 };
 
+const bool ast[5][18] ={                       //AST global array
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+};
+
 void initShifts()                               //SHIFT REGISTER
 {
     pinMode(DATA,OUTPUT);                       //Setting the outputs
@@ -253,6 +261,11 @@ void squash()                                   //Pong-game knockoff
     }
 }
 
+void asteroids()
+{
+  
+}
+
 void menu()                                                 //Mainmenu loop
 {
     int men(0), mlimit(2);                                  //Limit of menuitems
@@ -275,6 +288,10 @@ void menu()                                                 //Mainmenu loop
             case 2:                                         //TestMatrix
                     matrixArray(tst,10);
                     if(digitalRead(A4) == 1) matrixTest();  //Call a matrix test program to test all led's and buttons
+                    break;
+            case 3:                                         //Asteroid
+                    matrixArray(ast,10);                    //Asterois bitmap
+                    if(digitalRead(A4) == 1) asteroids();
                     break;
             default:                                        //Default case, if no item is selected
                     matrixClear();
